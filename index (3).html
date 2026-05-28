@@ -836,7 +836,11 @@ async function loadPostDetail(postId) {
   document.getElementById('detail-body').textContent = '';
 
   // 조회수 증가
-  await db.rpc('increment_view', { post_id: postId }).catch(() => {
+  try {
+  await db.rpc('increment_view', { post_id: postId });
+} catch(e) {
+  await db.from('posts').update({ view_count: (await db.from('posts').select('view_count').eq('id', postId).single()).data?.view_count + 1 }).eq('id', postId);
+}
     // RPC 없으면 직접 업데이트 (아래 SQL로 RPC 생성 권장)
     // create or replace function increment_view(post_id bigint)
     // returns void as $$ update posts set view_count = view_count + 1 where id = post_id; $$ language sql security definer;
