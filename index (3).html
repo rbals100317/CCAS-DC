@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>학교 커뮤니티</title>
-  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
   <style>
     /* =====================================================
        🎨 디자인 수정 팁:
@@ -400,14 +400,16 @@
 <!-- 토스트 메시지 -->
 <div id="toast" class="toast hidden"></div>
 
-<script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
 /* ================================================================
    ⚙️ 설정 - 반드시 여기를 먼저 수정하세요!
    Supabase 프로젝트 설정값을 입력하세요.
    https://supabase.com → 프로젝트 → Settings → API
 ================================================================ */
 const SUPABASE_URL = 'https://mlcnmfqtqthehlrcnftb.supabase.co';
-const SUPABASE_ANON_KEY 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1sY25tZnF0cXRoZWhscmNuZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MTE2ODQsImV4cCI6MjA5NTQ4NzY4NH0.VDwO5AtwzDTcCrgnguDgKd_X85uE6T5rt-JOFj4EWXQ';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1sY25tZnF0cXRoZWhscmNuZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MTE2ODQsImV4cCI6MjA5NTQ4NzY4NH0.VDwO5AtwzDTcCrgnguDgKd_X85uE6T5rt-JOFj4EWXQ';
 
 /* ================================================================
    📝 사이트 커스터마이징 설정
@@ -415,7 +417,7 @@ const SUPABASE_ANON_KEY 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const SITE_NAME = '우리학교 커뮤니티'; // 탭 타이틀
 
 // 💡 카테고리 수정: 원하는 게시판 분류를 여기서 추가/삭제하세요
-const CATEGORIES = ['전체', '자유', '질문', '유머', '정보', '인증', '익명'];
+const CATEGORIES = ['전체', '자유', '공지', '신문고', '개드립', '갈드컵', '노래추천', '잡담', '애니추천'];
 
 // 💡 페이지당 게시글 수 (기본 30)
 const PAGE_SIZE = 30;
@@ -425,9 +427,105 @@ const PAGE_SIZE = 30;
 const SUPER_ADMINS = [];
 
 /* ================================================================
+   🗄️ Supabase SQL 스키마 (처음 한 번만 실행하세요)
+   Supabase Dashboard → SQL Editor에 붙여넣고 실행하세요.
+================================================================
+
+-- 프로필 테이블
+create table profiles (
+  id uuid references auth.users on delete cascade primary key,
+  username text unique not null,
+  is_admin boolean default false,
+  is_banned boolean default false,
+  ban_reason text,
+  created_at timestamptz default now()
+);
+
+-- 게시글 테이블
+create table posts (
+  id bigserial primary key,
+  title text not null,
+  content text not null,
+  author_id uuid references profiles(id) on delete set null,
+  author_name text,
+  category text default '자유',
+  is_pinned boolean default false,
+  view_count integer default 0,
+  comment_count integer default 0,
+  created_at timestamptz default now()
+);
+
+-- 댓글 테이블
+create table comments (
+  id bigserial primary key,
+  post_id bigint references posts(id) on delete cascade,
+  author_id uuid references profiles(id) on delete set null,
+  author_name text,
+  content text not null,
+  created_at timestamptz default now()
+);
+
+-- 회원가입 시 프로필 자동 생성 트리거
+create or replace function handle_new_user()
+returns trigger as $$
+begin
+  insert into profiles (id, username)
+  values (new.id, coalesce(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)));
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function handle_new_user();
+
+-- 댓글 수 자동 업데이트 트리거
+create or replace function update_comment_count()
+returns trigger as $$
+begin
+  if (TG_OP = 'INSERT') then
+    update posts set comment_count = comment_count + 1 where id = new.post_id;
+  elsif (TG_OP = 'DELETE') then
+    update posts set comment_count = greatest(0, comment_count - 1) where id = old.post_id;
+  end if;
+  return null;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_comment_change
+  after insert or delete on comments
+  for each row execute function update_comment_count();
+
+-- Row Level Security 활성화
+alter table profiles enable row level security;
+alter table posts enable row level security;
+alter table comments enable row level security;
+
+-- profiles 정책
+create policy "누구나 프로필 조회" on profiles for select using (true);
+create policy "본인 프로필 수정" on profiles for update using (auth.uid() = id);
+
+-- posts 정책
+create policy "로그인한 사용자 게시글 조회" on posts for select using (auth.role() = 'authenticated');
+create policy "밴 안 당한 사용자 글쓰기" on posts for insert
+  with check (auth.uid() in (select id from profiles where is_banned = false));
+create policy "본인 또는 관리자 글 수정" on posts for update
+  using (auth.uid() = author_id or auth.uid() in (select id from profiles where is_admin = true));
+create policy "본인 또는 관리자 글 삭제" on posts for delete
+  using (auth.uid() = author_id or auth.uid() in (select id from profiles where is_admin = true));
+
+-- comments 정책
+create policy "로그인한 사용자 댓글 조회" on comments for select using (auth.role() = 'authenticated');
+create policy "밴 안 당한 사용자 댓글 쓰기" on comments for insert
+  with check (auth.uid() in (select id from profiles where is_banned = false));
+create policy "본인 또는 관리자 댓글 삭제" on comments for delete
+  using (auth.uid() = author_id or auth.uid() in (select id from profiles where is_admin = true));
+
+================================================================ */
+
+/* ================================================================
    앱 초기화
 ================================================================ */
-const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
@@ -984,7 +1082,7 @@ async function adminBanUser() {
   if (!reason) { showToast('밴 사유를 입력하세요.'); return; }
   if (!confirm(`이 유저를 밴하시겠습니까?\n사유: ${reason}`)) return;
 
-  const { error } = await db.from('profiles').update({ is_banned: true, ban_reason: reason }).eq('id', uid);
+  const { error } = await db.rpc('admin_ban_user', { target_id: uid, reason: reason, ban: true });
   if (!error) { showToast('밴 완료.'); loadAdminUserList(); }
   else showToast('실패: ' + error.message);
 }
@@ -994,7 +1092,7 @@ async function adminUnbanUser() {
   if (!uid) { showToast('유저 ID를 입력하세요.'); return; }
   if (!confirm('이 유저의 밴을 해제하시겠습니까?')) return;
 
-  const { error } = await db.from('profiles').update({ is_banned: false, ban_reason: null }).eq('id', uid);
+  const { error } = await db.rpc('admin_ban_user', { target_id: uid, reason: '', ban: false });
   if (!error) { showToast('밴 해제 완료.'); loadAdminUserList(); }
   else showToast('실패: ' + error.message);
 }
@@ -1002,7 +1100,7 @@ async function adminUnbanUser() {
 async function quickBanUser(uid, reason) {
   if (!uid || uid === currentUser.id) { showToast('본인은 밴할 수 없습니다.'); return; }
   if (!confirm(`이 유저를 밴하시겠습니까?\n사유: ${reason}`)) return;
-  const { error } = await db.from('profiles').update({ is_banned: true, ban_reason: reason }).eq('id', uid);
+  const { error } = await db.rpc('admin_ban_user', { target_id: uid, reason: reason, ban: true });
   if (!error) showToast('밴 완료.'); else showToast('실패: ' + error.message);
 }
 
@@ -1066,6 +1164,28 @@ function showToast(msg) {
 
 // ── 시작
 init();
+
+// ── 전역 함수 노출 (onclick 핸들러용)
+window.navigate = navigate;
+window.logout = logout;
+window.switchLoginTab = switchLoginTab;
+window.doLogin = doLogin;
+window.doRegister = doRegister;
+window.doSearch = doSearch;
+window.clearSearch = clearSearch;
+window.submitComment = submitComment;
+window.deleteComment = deleteComment;
+window.submitPost = submitPost;
+window.adminSearchUser = adminSearchUser;
+window.adminPinPost = adminPinPost;
+window.adminDeletePost = adminDeletePost;
+window.adminBanUser = adminBanUser;
+window.adminUnbanUser = adminUnbanUser;
+window.prefillBan = prefillBan;
+window.toggleAdmin = toggleAdmin;
+window.quickBanUser = quickBanUser;
+window.togglePin = togglePin;
+window.deletePost = deletePost;
 </script>
 </body>
 </html>
