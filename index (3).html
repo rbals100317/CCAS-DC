@@ -16,6 +16,7 @@
       --border: #c0c0c0; --border-light: #e0e0e0;
       --text: #222; --text-muted: #777;
       --notice-bg: #fff8e1; --danger: #cc2222; --reply-bg: #f5f8ff;
+      --concept-bg: #fff3cd; --concept-border: #ffc107;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Malgun Gothic','맑은 고딕',Dotum,sans-serif;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh}
@@ -46,12 +47,13 @@
     /* 게시글 목록 */
     #post-table{width:100%;border-collapse:collapse}
     #post-table th{background:#f0f0f0;border:1px solid var(--border);padding:6px 8px;text-align:center;font-size:12px;color:#555;font-weight:bold}
-    #post-table td{border:1px solid var(--border-light);padding:6px 8px}
+    #post-table td{border:1px solid var(--border-light);padding:6px 8px;cursor:pointer}
     #post-table tr:hover td{background:#f9f9ff}
+    #post-table tr:hover .post-title-link{color:var(--primary);font-weight:bold}
     .post-num{text-align:center;color:var(--text-muted);width:55px}
     .post-cat{text-align:center;width:60px}
     .post-cat span{background:var(--primary);color:#fff;padding:2px 6px;border-radius:2px;font-size:11px}
-    .post-title-link{color:#1a1a1a;font-size:13px}
+    .post-title-link{color:#1a1a1a;font-size:13px;transition:.15s}
     .post-title-link:hover{color:var(--primary)}
     .post-title-link .comment-count{color:var(--accent);font-size:11px;margin-left:4px}
     .post-author{text-align:center;width:90px;color:var(--text-muted)}
@@ -59,8 +61,10 @@
     .post-views{text-align:center;width:45px;color:var(--text-muted);font-size:11px}
     .post-votes-col{text-align:center;width:55px;font-size:11px}
     .post-row.notice td{background:var(--notice-bg)}
+    .post-row.concept td{background:var(--concept-bg);border-color:var(--concept-border)}
     .post-row.pinned .post-title-link{font-weight:bold}
     .pin-badge{background:var(--accent);color:#fff;font-size:10px;padding:1px 5px;border-radius:2px;margin-right:5px}
+    .concept-badge{background:var(--concept-border);color:#333;font-size:10px;padding:1px 5px;border-radius:2px;margin-right:5px}
     .new-badge{color:var(--danger);font-size:11px;margin-left:3px;font-weight:bold}
     .upvote-text{color:#c00}
 
@@ -72,18 +76,19 @@
 
     /* 페이징 */
     #pagination{display:flex;justify-content:center;align-items:center;gap:4px;margin-top:12px}
-    .page-btn{border:1px solid var(--border);background:var(--surface);padding:5px 9px;color:var(--text);border-radius:2px;min-width:30px;text-align:center}
+    .page-btn{border:1px solid var(--border);background:var(--surface);padding:5px 9px;color:var(--text);border-radius:2px;min-width:30px;text-align:center;cursor:pointer}
     .page-btn:hover{background:#eef;border-color:var(--primary);color:var(--primary)}
     .page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 
     /* 버튼 */
     #board-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
-    .btn{border:none;padding:6px 14px;border-radius:3px;font-size:12px;font-weight:bold}
+    .btn{border:none;padding:6px 14px;border-radius:3px;font-size:12px;font-weight:bold;cursor:pointer}
     .btn-primary{background:var(--primary);color:#fff} .btn-primary:hover{background:var(--primary-dark)}
     .btn-accent{background:var(--accent);color:#fff} .btn-accent:hover{background:#c45000}
     .btn-danger{background:var(--danger);color:#fff} .btn-danger:hover{background:#aa1111}
     .btn-outline{background:var(--surface);border:1px solid var(--border);color:var(--text)} .btn-outline:hover{background:#f0f0f0}
     .btn-sm{padding:3px 8px;font-size:11px}
+    .btn-lg{padding:12px 24px;font-size:14px}
 
     /* 검색 */
     #search-bar{display:flex;gap:4px}
@@ -96,12 +101,13 @@
     .post-detail-title{font-size:17px;font-weight:bold;margin-bottom:8px}
     .post-detail-meta{font-size:12px;color:var(--text-muted);display:flex;gap:16px;flex-wrap:wrap}
     .post-detail-body{padding:16px 14px;min-height:200px;line-height:1.7;font-size:14px;white-space:pre-wrap;word-break:break-all}
-    .post-detail-actions{padding:8px 14px;border-top:1px solid var(--border-light);display:flex;gap:6px;justify-content:center}
-    .back-btn{color:var(--primary);font-size:12px;cursor:pointer;margin-bottom:8px;display:inline-block}
+    .post-detail-body img{max-width:100%;height:auto;margin:8px 0}
+    .post-detail-actions{padding:8px 14px;border-top:1px solid var(--border-light);display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+    .back-btn{color:var(--primary);font-size:12px;cursor:pointer;margin-bottom:8px;display:inline-block;background:none;border:none;padding:0}
     .back-btn:hover{text-decoration:underline}
 
     /* 개추/비추 */
-    .vote-section{display:flex;justify-content:center;gap:16px;padding:14px;border-top:1px solid var(--border-light)}
+    .vote-section{display:flex;justify-content:center;gap:16px;padding:14px;border-top:1px solid var(--border-light);flex-wrap:wrap}
     .vote-btn{display:flex;align-items:center;gap:6px;padding:8px 24px;border-radius:4px;font-size:14px;font-weight:bold;border:2px solid var(--border);background:var(--surface);transition:.2s}
     .vote-btn.up:hover,.vote-btn.up.active{background:#fff0f0;border-color:#cc2222;color:#cc2222}
     .vote-btn.down:hover,.vote-btn.down.active{background:#f0f0ff;border-color:#2244cc;color:#2244cc}
@@ -111,13 +117,24 @@
     .comment-header{background:#f0f0f0;border-bottom:1px solid var(--border);padding:7px 12px;font-weight:bold;font-size:13px}
     .comment-item{border-bottom:1px solid var(--border-light);padding:10px 14px}
     .comment-item:last-child{border-bottom:none}
-    .comment-meta{font-size:11px;color:var(--text-muted);margin-bottom:5px;display:flex;gap:8px;align-items:center}
+    .comment-meta{font-size:11px;color:var(--text-muted);margin-bottom:5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .comment-author{font-weight:bold;color:var(--text)}
-    .comment-body{font-size:13px;line-height:1.6;white-space:pre-wrap}
-    .comment-actions{margin-top:5px;display:flex;gap:8px}
-    .comment-action-btn{color:#888;font-size:11px;cursor:pointer;background:none;border:none;padding:0}
+    .comment-body{font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-all}
+    .comment-actions{margin-top:5px;display:flex;gap:8px;flex-wrap:wrap}
+    .comment-action-btn{color:#888;font-size:11px;cursor:pointer;background:none;border:none;padding:0;font-family:inherit}
     .comment-action-btn:hover{color:var(--accent);text-decoration:underline}
     .comment-delete-btn{color:var(--danger) !important}
+    .concept-comment{background:var(--concept-bg);border-left:3px solid var(--concept-border);padding:10px;margin:8px 0;border-radius:3px}
+    .concept-comment .comment-meta{color:var(--accent);font-weight:bold}
+
+    /* 최신글 미리보기 */
+    .latest-posts{margin-top:16px;padding:12px;background:#f5f5f5;border:1px solid var(--border);border-radius:4px}
+    .latest-posts h4{font-size:12px;font-weight:bold;margin-bottom:8px;color:#555}
+    .latest-post-item{padding:6px;border-bottom:1px solid var(--border-light);font-size:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+    .latest-post-item:last-child{border-bottom:none}
+    .latest-post-item:hover{background:#fff;color:var(--primary)}
+    .latest-post-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .latest-post-date{color:#999;font-size:10px;white-space:nowrap;margin-left:8px}
 
     /* 대댓글 */
     .replies{margin-top:6px;margin-left:20px;border-left:2px solid var(--border-light);padding-left:10px}
@@ -130,8 +147,9 @@
 
     /* 댓글 작성 */
     .comment-write{padding:12px 14px;border-top:1px solid var(--border);background:#fafafa}
-    .comment-write textarea{width:100%;border:1px solid var(--border);padding:8px;resize:vertical;min-height:70px;border-radius:2px}
-    .comment-write-actions{margin-top:6px;display:flex;justify-content:flex-end}
+    .comment-write textarea{width:100%;border:1px solid var(--border);padding:8px;resize:vertical;min-height:70px;border-radius:2px;font-size:12px}
+    .comment-write-actions{margin-top:6px;display:flex;justify-content:flex-end;gap:6px}
+    .comment-write-help{font-size:11px;color:#999;margin-top:4px}
     .no-comments{padding:20px;text-align:center;color:var(--text-muted)}
 
     /* 글쓰기 */
@@ -141,7 +159,9 @@
     .form-row input,.form-row select,.form-row textarea{width:100%;border:1px solid var(--border);padding:8px;border-radius:2px}
     .form-row textarea{min-height:350px;resize:vertical;line-height:1.6}
     .form-row input:focus,.form-row textarea:focus,.form-row select:focus{outline:none;border-color:var(--primary)}
-    .form-actions{display:flex;gap:8px;justify-content:flex-end}
+    .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+    .image-preview{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+    .image-preview img{max-width:100px;height:100px;object-fit:cover;border:1px solid var(--border);border-radius:3px;cursor:pointer}
 
     /* 로그인 */
     #login-box{max-width:380px;margin:60px auto;background:var(--surface);border:1px solid var(--border);padding:30px}
@@ -161,7 +181,7 @@
     .banned-badge{background:var(--danger);color:#fff;font-size:10px;padding:2px 6px;border-radius:2px}
     .admin-input-row{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
     .admin-input-row input{flex:1;border:1px solid var(--border);padding:6px 8px;border-radius:2px;min-width:100px}
-    .admin-link{color:#fff;font-size:11px;background:rgba(255,100,0,.7);padding:3px 8px;border-radius:3px;cursor:pointer}
+    .admin-link{color:#fff;font-size:11px;background:rgba(255,100,0,.7);padding:3px 8px;border-radius:3px;cursor:pointer;border:none;font-family:inherit}
 
     /* 유틸 */
     .hidden{display:none !important}
@@ -169,6 +189,11 @@
     .loading{padding:20px;text-align:center;color:var(--text-muted)}
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 22px;border-radius:4px;font-size:13px;z-index:9999}
     .banned-notice{background:#fee;border:1px solid var(--danger);color:var(--danger);padding:14px;text-align:center;border-radius:4px;margin:20px}
+
+    /* 뒤로가기 버튼 */
+    .nav-back-top{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .nav-back-btn{padding:8px 12px;background:var(--primary);color:#fff;border:none;border-radius:3px;cursor:pointer;font-size:13px;font-family:inherit}
+    .nav-back-btn:hover{background:var(--primary-dark)}
   </style>
 </head>
 <body>
@@ -176,7 +201,6 @@
 <div id="header">
   <div id="header-top">
     <div id="site-title" onclick="navigate('board')">
-      <!-- 💡 사이트 이름 수정 -->
       CCAS<span> DC</span>
     </div>
     <div id="header-user">
@@ -242,14 +266,17 @@
       </table>
       <div id="board-actions">
         <div id="pagination"></div>
-        <button class="btn btn-primary" onclick="navigate('write')">✏ 글쓰기</button>
+        <button class="btn btn-primary btn-lg" onclick="navigate('write')">✏ 글쓰기</button>
       </div>
     </div>
   </div>
 
   <!-- 게시글 상세 -->
   <div id="view-post" class="hidden">
-    <span class="back-btn" onclick="navigate('board')">← 목록으로</span>
+    <div class="nav-back-top">
+      <button class="nav-back-btn" onclick="goBackToBoardCategory()">← 목록으로</button>
+      <span id="back-category-label" style="color:#555;font-size:12px"></span>
+    </div>
     <div id="post-detail">
       <div class="post-detail-header">
         <div class="post-detail-title" id="detail-title"></div>
@@ -272,22 +299,44 @@
       <div id="comment-list"></div>
       <div class="comment-write">
         <div style="font-size:12px;color:#555;margin-bottom:6px"><b id="comment-username"></b>으로 댓글 작성</div>
-        <textarea id="comment-input" placeholder="댓글을 입력하세요"></textarea>
-        <div class="comment-write-actions"><button class="btn btn-primary" onclick="submitComment()">댓글 등록</button></div>
+        <textarea id="comment-input" placeholder="댓글을 입력하세요 (Shift+Enter = 줄바꿈)"></textarea>
+        <div class="comment-write-help">💡 Enter로 등록 | Shift+Enter로 줄바꿈</div>
+        <div class="comment-write-actions">
+          <button class="btn btn-primary" onclick="submitComment()">댓글 등록</button>
+        </div>
       </div>
+    </div>
+    <div class="latest-posts">
+      <h4>🔥 최신 댓글 5개</h4>
+      <div id="latest-comments"></div>
     </div>
   </div>
 
   <!-- 글쓰기 -->
   <div id="view-write" class="hidden">
-    <span class="back-btn" onclick="navigate('board')">← 목록으로</span>
+    <div class="nav-back-top">
+      <button class="nav-back-btn" onclick="goBackToBoardCategory()">← 목록으로</button>
+    </div>
     <div id="write-form">
       <div class="card-header" style="margin:-16px -16px 16px"><h2 id="write-title">✏ 글쓰기</h2></div>
-      <div class="form-row"><label>분류</label><select id="write-category"></select></div>
-      <div class="form-row"><label>제목</label><input type="text" id="write-post-title" placeholder="제목" maxlength="100" /></div>
-      <div class="form-row"><label>내용</label><textarea id="write-content" placeholder="내용을 입력하세요"></textarea></div>
+      <div class="form-row">
+        <label>분류</label>
+        <select id="write-category"></select>
+      </div>
+      <div class="form-row">
+        <label>제목</label>
+        <input type="text" id="write-post-title" placeholder="제목" maxlength="100" />
+      </div>
+      <div class="form-row">
+        <label>내용</label>
+        <textarea id="write-content" placeholder="내용을 입력하세요"></textarea>
+      </div>
+      <div class="form-row" style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="write-concept" style="width:auto" />
+        <label style="margin:0">개념글로 등록</label>
+      </div>
       <div class="form-actions">
-        <button class="btn btn-outline" onclick="navigate('board')">취소</button>
+        <button class="btn btn-outline" onclick="goBackToBoardCategory()">취소</button>
         <button class="btn btn-primary" id="btn-submit-post" onclick="submitPost()">등록</button>
       </div>
     </div>
@@ -295,7 +344,9 @@
 
   <!-- 관리자 패널 -->
   <div id="view-admin" class="hidden">
-    <span class="back-btn" onclick="navigate('board')">← 게시판으로</span>
+    <div class="nav-back-top">
+      <button class="nav-back-btn" onclick="goBackToBoardCategory()">← 게시판으로</button>
+    </div>
     <div id="admin-panel" class="card">
       <div class="card-header"><h2>⚙ 관리자 패널</h2></div>
 
@@ -359,103 +410,12 @@
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-/* ================================================================
-   ⚙️ Supabase 설정 - 여기만 수정하면 됩니다!
-================================================================ */
 const SUPABASE_URL = 'https://mlcnmfqtqthehlrcnftb.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1sY25tZnF0cXRoZWhscmNuZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MTE2ODQsImV4cCI6MjA5NTQ4NzY4NH0.VDwO5AtwzDTcCrgnguDgKd_X85uE6T5rt-JOFj4EWXQ';
 
-/* ================================================================
-   📝 사이트 설정
-   💡 카테고리 추가/삭제는 아래 배열을 수정하세요
-================================================================ */
 const SITE_NAME = 'CCAS DC';
-const CATEGORIES = ['전체', '자유', '공지', '신문고', '개드립', '갈드컵', '노래추천', '잡담'];
+const CATEGORIES = ['전체', '자유', '공지', '신문고', '개드립', '갈드컵', '노래추천', '잡담', '19금', '공부'];
 const PAGE_SIZE = 30;
-
-/*
-================================================================
-🗄️ 새 기능 추가 SQL (Supabase SQL Editor에서 실행)
-================================================================
-
--- profiles에 admin_level 추가 (0=일반, 1=파딱, 2=주딱)
-alter table profiles add column if not exists admin_level integer default 0;
-
--- posts에 투표 컬럼 추가
-alter table posts add column if not exists upvotes integer default 0;
-alter table posts add column if not exists downvotes integer default 0;
-
--- 투표 기록 테이블
-create table if not exists post_votes (
-  post_id bigint references posts(id) on delete cascade,
-  user_id uuid references profiles(id) on delete cascade,
-  vote_type text check (vote_type in ('up','down')),
-  primary key (post_id, user_id)
-);
-alter table post_votes enable row level security;
-create policy "투표 조회" on post_votes for select using (auth.role()='authenticated');
-create policy "투표 추가" on post_votes for insert with check (auth.uid()=user_id);
-create policy "투표 수정" on post_votes for update using (auth.uid()=user_id);
-create policy "투표 삭제" on post_votes for delete using (auth.uid()=user_id);
-
--- 대댓글용 parent_id
-alter table comments add column if not exists parent_id bigint references comments(id) on delete cascade;
-
--- 투표 함수
-create or replace function vote_post(p_post_id bigint, p_vote_type text)
-returns void as $$
-declare existing_vote text;
-begin
-  select vote_type into existing_vote from post_votes where post_id=p_post_id and user_id=auth.uid();
-  if existing_vote is null then
-    insert into post_votes(post_id,user_id,vote_type) values(p_post_id,auth.uid(),p_vote_type);
-    if p_vote_type='up' then update posts set upvotes=upvotes+1 where id=p_post_id;
-    else update posts set downvotes=downvotes+1 where id=p_post_id; end if;
-  elsif existing_vote=p_vote_type then
-    delete from post_votes where post_id=p_post_id and user_id=auth.uid();
-    if p_vote_type='up' then update posts set upvotes=greatest(0,upvotes-1) where id=p_post_id;
-    else update posts set downvotes=greatest(0,downvotes-1) where id=p_post_id; end if;
-  else
-    update post_votes set vote_type=p_vote_type where post_id=p_post_id and user_id=auth.uid();
-    if p_vote_type='up' then update posts set upvotes=upvotes+1,downvotes=greatest(0,downvotes-1) where id=p_post_id;
-    else update posts set downvotes=downvotes+1,upvotes=greatest(0,upvotes-1) where id=p_post_id; end if;
-  end if;
-end;
-$$ language plpgsql security definer set search_path=public;
-
--- 밴 함수 업데이트 (주딱만 가능)
-create or replace function admin_ban_user(target_id uuid, reason text, ban boolean)
-returns void as $$
-begin
-  if not exists(select 1 from profiles where id=auth.uid() and admin_level>=2) then
-    raise exception '주딱 권한이 필요합니다.';
-  end if;
-  update profiles set is_banned=ban, ban_reason=case when ban then reason else null end where id=target_id;
-end;
-$$ language plpgsql security definer set search_path=public;
-
--- 관리자 등급 설정 함수 (주딱만 가능)
-create or replace function admin_set_level(target_id uuid, level integer)
-returns void as $$
-begin
-  if not exists(select 1 from profiles where id=auth.uid() and admin_level>=2) then
-    raise exception '주딱 권한이 필요합니다.';
-  end if;
-  update profiles set admin_level=level where id=target_id;
-end;
-$$ language plpgsql security definer set search_path=public;
-
--- posts RLS 수정 (파딱 이상 삭제 가능)
-drop policy if exists "본인 또는 관리자 글 삭제" on posts;
-create policy "본인 또는 관리자 글 삭제" on posts for delete
-  using (auth.uid()=author_id or auth.uid() in (select id from profiles where admin_level>=1));
-
--- comments RLS 수정
-drop policy if exists "본인 또는 관리자 댓글 삭제" on comments;
-create policy "본인 또는 관리자 댓글 삭제" on comments for delete
-  using (auth.uid()=author_id or auth.uid() in (select id from profiles where admin_level>=1));
-
-================================================================ */
 
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -465,7 +425,6 @@ let editingPostId = null, searchQuery = null, searchType = 'title';
 
 document.title = SITE_NAME;
 
-/* ── 초기화 ── */
 async function init() {
   buildCategoryBar();
   buildWriteCategories();
@@ -502,7 +461,6 @@ function updateHeader() {
   }
 }
 
-/* ── 닉네임 HTML 생성 ── */
 function nameHtml(name, adminLevel) {
   const level = adminLevel || 0;
   const cls = level >= 2 ? 'name-juddak' : level >= 1 ? 'name-paddak' : '';
@@ -522,7 +480,9 @@ function buildCategoryBar() {
       document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       document.getElementById('board-title').textContent = cat + ' 게시판';
-      loadPosts();
+      if (currentView === 'board') loadPosts();
+      else if (currentView === 'post') goBackToBoardCategory();
+      else navigate('board');
     };
     bar.appendChild(tab);
   });
@@ -538,7 +498,6 @@ function buildWriteCategories() {
   });
 }
 
-/* ── 라우터 ── */
 function navigate(view, params = {}) {
   if (view !== 'login' && !currentUser) { navigate('login'); return; }
   if (view !== 'login' && currentProfile?.is_banned) { showBannedNotice(); return; }
@@ -552,6 +511,17 @@ function navigate(view, params = {}) {
   window.scrollTo(0, 0);
 }
 
+function goBackToBoardCategory() {
+  currentPage = 1;
+  searchQuery = null;
+  currentView = 'board';
+  navigate('board');
+  document.querySelectorAll('.cat-tab').forEach(t => {
+    t.classList.toggle('active', t.textContent === currentCategory);
+  });
+  document.getElementById('board-title').textContent = currentCategory + ' 게시판';
+}
+
 function showBannedNotice() {
   ['login','board','post','write','admin'].forEach(v => document.getElementById('view-'+v).classList.add('hidden'));
   document.getElementById('main').innerHTML = `
@@ -563,7 +533,6 @@ function showBannedNotice() {
     </div>`;
 }
 
-/* ── 인증 ── */
 function switchLoginTab(tab) {
   document.querySelectorAll('.login-tab').forEach((t,i) => t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
   document.getElementById('login-form').classList.toggle('hidden', tab!=='login');
@@ -598,11 +567,10 @@ async function doRegister() {
 
 async function logout() { await db.auth.signOut(); }
 
-/* ── 게시글 목록 ── */
 async function loadPosts() {
   const tbody = document.getElementById('post-list-body');
   tbody.innerHTML = '<tr><td colspan="7" class="loading">불러오는 중...</td></tr>';
-  let query = db.from('posts').select('id,title,author_name,author_admin_level,category,is_pinned,view_count,comment_count,upvotes,downvotes,created_at', { count: 'exact' });
+  let query = db.from('posts').select('id,title,author_name,author_admin_level,category,is_pinned,is_concept,view_count,comment_count,upvotes,downvotes,created_at', { count: 'exact' });
   if (currentCategory !== '전체') query = query.eq('category', currentCategory);
   if (searchQuery) {
     if (searchType==='title') query = query.ilike('title',`%${searchQuery}%`);
@@ -619,7 +587,8 @@ async function loadPosts() {
   posts.forEach((post, idx) => {
     const isNew = (Date.now()-new Date(post.created_at).getTime()) < 3600000;
     const tr = document.createElement('tr');
-    tr.className = 'post-row'+(post.is_pinned?' notice pinned':'');
+    tr.className = 'post-row'+(post.is_pinned?' notice':post.is_concept?' concept':'');
+    tr.onclick = () => navigate('post', {postId: post.id});
     const level = post.author_admin_level || 0;
     const nameCls = level>=2?'name-juddak':level>=1?'name-paddak':'';
     tr.innerHTML = `
@@ -627,11 +596,12 @@ async function loadPosts() {
       <td class="post-cat"><span>${escHtml(post.category)}</span></td>
       <td>
         ${post.is_pinned?'<span class="pin-badge">공지</span>':''}
-        <a class="post-title-link" href="#" onclick="navigate('post',{postId:${post.id}});return false">
+        ${post.is_concept?'<span class="concept-badge">⭐ 개념</span>':''}
+        <span class="post-title-link">
           ${escHtml(post.title)}
           ${post.comment_count>0?`<span class="comment-count">[${post.comment_count}]</span>`:''}
           ${isNew?'<span class="new-badge">N</span>':''}
-        </a>
+        </span>
       </td>
       <td class="post-author"><span class="${nameCls}">${escHtml(post.author_name||'(탈퇴)')}</span></td>
       <td class="post-date">${formatDate(post.created_at)}</td>
@@ -659,13 +629,14 @@ function buildPagination(total) {
 function doSearch() { searchQuery=document.getElementById('search-input').value.trim()||null; searchType=document.getElementById('search-type').value; currentPage=1; loadPosts(); }
 function clearSearch() { searchQuery=null; document.getElementById('search-input').value=''; currentPage=1; loadPosts(); }
 
-/* ── 게시글 상세 ── */
 async function loadPostDetail(postId) {
   document.getElementById('detail-title').textContent = '불러오는 중...';
   document.getElementById('detail-body').textContent = '';
   try { await db.rpc('increment_view',{post_id:postId}); } catch(e) {}
   const { data: post } = await db.from('posts').select('*').eq('id', postId).single();
   if (!post) { navigate('board'); return; }
+
+  document.getElementById('back-category-label').textContent = '📁 ' + post.category;
 
   const level = post.author_admin_level || 0;
   const nameCls = level>=2?'name-juddak':level>=1?'name-paddak':'';
@@ -679,7 +650,6 @@ async function loadPostDetail(postId) {
   document.getElementById('upvote-count').textContent = post.upvotes||0;
   document.getElementById('downvote-count').textContent = post.downvotes||0;
 
-  // 내 투표 상태
   if (currentUser) {
     const { data: myVote } = await db.from('post_votes').select('vote_type').eq('post_id',postId).eq('user_id',currentUser.id).maybeSingle();
     document.getElementById('btn-upvote').classList.toggle('active', myVote?.vote_type==='up');
@@ -694,15 +664,48 @@ async function loadPostDetail(postId) {
 
   if (isOwner) { const b=document.createElement('button'); b.className='btn btn-outline'; b.textContent='수정'; b.onclick=()=>navigate('write',{editId:post.id}); actionsEl.appendChild(b); }
   if (isOwner||isPaddak) { const b=document.createElement('button'); b.className='btn btn-danger'; b.textContent='삭제'; b.onclick=()=>deletePost(post.id); actionsEl.appendChild(b); }
+  if (isPaddak && !post.is_concept) { const b=document.createElement('button'); b.className='btn btn-accent'; b.textContent='⭐ 개념글'; b.onclick=()=>markConcept(post.id,true); actionsEl.appendChild(b); }
+  if (isPaddak && post.is_concept) { const b=document.createElement('button'); b.className='btn btn-outline'; b.textContent='개념해제'; b.onclick=()=>markConcept(post.id,false); actionsEl.appendChild(b); }
   if (isPaddak && !post.is_pinned) { const b=document.createElement('button'); b.className='btn btn-accent'; b.textContent='📌 공지고정'; b.onclick=()=>togglePin(post.id,true); actionsEl.appendChild(b); }
   if (isPaddak && post.is_pinned) { const b=document.createElement('button'); b.className='btn btn-outline'; b.textContent='고정해제'; b.onclick=()=>togglePin(post.id,false); actionsEl.appendChild(b); }
   if (isJuddak && post.author_id) { const b=document.createElement('button'); b.className='btn btn-danger'; b.textContent='작성자 밴'; b.onclick=()=>{const r=prompt('밴 사유:');if(r)quickBanUser(post.author_id,r);}; actionsEl.appendChild(b); }
 
   document.getElementById('comment-username').textContent = currentProfile?.username || '';
   loadComments(postId);
+  loadLatestComments();
 }
 
-/* ── 투표 ── */
+async function markConcept(postId, isConcept) {
+  const { error } = await db.from('posts').update({is_concept:isConcept}).eq('id', postId);
+  if (!error) { showToast(isConcept?'개념글로 등록되었습니다.':'개념 해제되었습니다.'); loadPostDetail(postId); }
+}
+
+async function loadLatestComments() {
+  const { data: comments } = await db.from('comments')
+    .select('*, profiles(admin_level)')
+    .eq('post_id', currentPostId)
+    .order('upvotes', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(5);
+  
+  const el = document.getElementById('latest-comments');
+  if (!comments || comments.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:#999;padding:8px">댓글이 아직 없습니다.</div>';
+    return;
+  }
+  el.innerHTML = '';
+  comments.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'latest-post-item';
+    div.innerHTML = `
+      <div class="latest-post-title">
+        <strong>${escHtml(c.author_name || '(탈퇴)')}</strong>: ${escHtml(c.content.substring(0, 40))}${c.content.length > 40 ? '...' : ''}
+      </div>
+      <div class="latest-post-date">👍${c.upvotes || 0}</div>`;
+    el.appendChild(div);
+  });
+}
+
 async function votePost(type) {
   if (!currentPostId) return;
   const { error } = await db.rpc('vote_post',{p_post_id:currentPostId, p_vote_type:type});
@@ -721,7 +724,7 @@ async function votePost(type) {
 async function deletePost(postId) {
   if (!confirm('정말 삭제하시겠습니까?')) return;
   const { error } = await db.from('posts').delete().eq('id', postId);
-  if (!error) { showToast('삭제되었습니다.'); navigate('board'); }
+  if (!error) { showToast('삭제되었습니다.'); goBackToBoardCategory(); }
   else showToast('삭제 실패: '+error.message);
 }
 
@@ -730,9 +733,7 @@ async function togglePin(postId, pin) {
   if (!error) { showToast(pin?'공지로 고정되었습니다.':'고정 해제되었습니다.'); loadPostDetail(postId); }
 }
 
-/* ── 댓글 ── */
 async function loadComments(postId) {
-  // comments + profiles join으로 admin_level 가져오기
   const { data: comments } = await db.from('comments')
     .select('*, profiles(admin_level)')
     .eq('post_id', postId)
@@ -751,7 +752,6 @@ async function loadComments(postId) {
   const myLevel = currentProfile?.admin_level || 0;
   const isPaddak = myLevel >= 1, isJuddak = myLevel >= 2;
 
-  // 부모 댓글만 먼저
   const parents = comments.filter(c => !c.parent_id);
   const replies = comments.filter(c => c.parent_id);
 
@@ -759,21 +759,25 @@ async function loadComments(postId) {
     const adminLevel = c.profiles?.admin_level || 0;
     const canDelete = (currentUser && c.author_id===currentUser.id) || isPaddak;
     const div = document.createElement('div');
-    div.className = 'comment-item';
+    div.className = 'comment-item' + (c.upvotes && c.upvotes >= 3 ? ' concept-comment' : '');
     div.id = 'comment-'+c.id;
+    const conceptBadge = c.upvotes && c.upvotes >= 3 ? '<span style="color:var(--concept-border);font-weight:bold;margin-right:4px">⭐ 개념</span>' : '';
     div.innerHTML = `
       <div class="comment-meta">
+        ${conceptBadge}
         ${nameHtml(c.author_name, adminLevel)}
         <span>${formatDateFull(c.created_at)}</span>
+        ${c.upvotes > 0 ? `<span style="color:#ff6b00;font-weight:bold">👍${c.upvotes}</span>` : ''}
       </div>
       <div class="comment-body">${escHtml(c.content)}</div>
       <div class="comment-actions">
+        <button class="comment-action-btn" onclick="voteComment(${c.id})">👍 추천</button>
         <button class="comment-action-btn" onclick="showReplyForm(${c.id})">💬 답글</button>
         ${canDelete?`<button class="comment-action-btn comment-delete-btn" onclick="deleteComment(${c.id},${postId})">삭제</button>`:''}
         ${isJuddak&&c.author_id?`<button class="comment-action-btn comment-delete-btn" onclick="quickBanUser('${c.author_id}','댓글 규정 위반')">작성자 밴</button>`:''}
       </div>
       <div class="reply-form hidden" id="reply-form-${c.id}">
-        <textarea id="reply-input-${c.id}" placeholder="답글을 입력하세요" style="width:100%;border:1px solid var(--border);padding:6px;resize:vertical;min-height:55px;border-radius:2px;font-size:12px"></textarea>
+        <textarea id="reply-input-${c.id}" placeholder="답글을 입력하세요"></textarea>
         <div class="reply-form-actions">
           <button class="btn btn-outline btn-sm" onclick="hideReplyForm(${c.id})">취소</button>
           <button class="btn btn-primary btn-sm" onclick="submitReply(${c.id},${postId})">등록</button>
@@ -782,7 +786,6 @@ async function loadComments(postId) {
       <div class="replies" id="replies-${c.id}"></div>`;
     listEl.appendChild(div);
 
-    // 대댓글 렌더링
     const myReplies = replies.filter(r => r.parent_id === c.id);
     const repliesEl = div.querySelector('#replies-'+c.id);
     myReplies.forEach(r => {
@@ -802,6 +805,16 @@ async function loadComments(postId) {
       repliesEl.appendChild(rdiv);
     });
   });
+}
+
+async function voteComment(commentId) {
+  const { data: existingVote } = await db.from('comment_votes').select('id').eq('comment_id', commentId).eq('user_id', currentUser.id).maybeSingle();
+  
+  if (!existingVote) {
+    await db.from('comment_votes').insert({ comment_id: commentId, user_id: currentUser.id });
+    await db.from('comments').update({ upvotes: db.raw('upvotes + 1') }).eq('id', commentId);
+  }
+  loadComments(currentPostId);
 }
 
 function showReplyForm(commentId) {
@@ -833,7 +846,7 @@ async function submitComment() {
   const { error } = await db.from('comments').insert({
     post_id: currentPostId, author_id: currentUser.id, author_name: currentProfile.username, content
   });
-  if (!error) { input.value=''; loadComments(currentPostId); showToast('댓글이 등록되었습니다.'); }
+  if (!error) { input.value=''; loadComments(currentPostId); loadLatestComments(); showToast('댓글이 등록되었습니다.'); }
   else showToast('댓글 등록 실패: '+error.message);
 }
 
@@ -843,12 +856,12 @@ async function deleteComment(commentId, postId) {
   if (!error) { loadComments(postId); showToast('삭제되었습니다.'); }
 }
 
-/* ── 글쓰기 ── */
 function resetWriteForm() {
   document.getElementById('write-title').textContent='✏ 글쓰기';
   document.getElementById('btn-submit-post').textContent='등록';
   document.getElementById('write-post-title').value='';
   document.getElementById('write-content').value='';
+  document.getElementById('write-concept').checked = false;
   editingPostId=null;
 }
 
@@ -860,21 +873,23 @@ async function loadEditPost(postId) {
   document.getElementById('write-post-title').value=post.title;
   document.getElementById('write-content').value=post.content;
   document.getElementById('write-category').value=post.category;
+  document.getElementById('write-concept').checked = post.is_concept || false;
 }
 
 async function submitPost() {
   const title = document.getElementById('write-post-title').value.trim();
   const content = document.getElementById('write-content').value.trim();
   const category = document.getElementById('write-category').value;
+  const isConcept = document.getElementById('write-concept').checked;
   if (!title) { showToast('제목을 입력하세요.'); return; }
   if (!content) { showToast('내용을 입력하세요.'); return; }
   if (editingPostId) {
-    const { error } = await db.from('posts').update({title,content,category}).eq('id',editingPostId);
+    const { error } = await db.from('posts').update({title,content,category,is_concept:isConcept}).eq('id',editingPostId);
     if (!error) { showToast('수정되었습니다.'); navigate('post',{postId:editingPostId}); }
     else showToast('수정 실패: '+error.message);
   } else {
     const { data, error } = await db.from('posts').insert({
-      title, content, category,
+      title, content, category, is_concept: isConcept,
       author_id: currentUser.id,
       author_name: currentProfile.username,
       author_admin_level: currentProfile.admin_level || 0
@@ -884,11 +899,26 @@ async function submitPost() {
   }
 }
 
-/* ── 관리자 패널 ── */
+// 댓글 엔터 처리
+document.addEventListener('keydown', function(e) {
+  const textarea = e.target;
+  if (textarea.id === 'comment-input') {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submitComment();
+    }
+  } else if (textarea.id.startsWith('reply-input-')) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const commentId = textarea.id.replace('reply-input-', '');
+      submitReply(commentId, currentPostId);
+    }
+  }
+});
+
 async function loadAdminPanel() {
   const myLevel = currentProfile?.admin_level || 0;
   if (myLevel < 1) { navigate('board'); return; }
-  // 주딱만 밴/등급 설정 보이게
   document.getElementById('ban-section').style.display = myLevel>=2?'':'none';
   document.getElementById('level-section').style.display = myLevel>=2?'':'none';
   await loadAdminUserList();
@@ -986,7 +1016,6 @@ async function quickBanUser(uid, reason) {
   if (!error) showToast('밴 완료.'); else showToast('실패: '+error.message);
 }
 
-/* ── 유틸 ── */
 function escHtml(str) {
   if (!str) return '';
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1008,12 +1037,12 @@ function showToast(msg) {
 
 init();
 
-/* ── 전역 노출 ── */
 window.navigate=navigate; window.logout=logout; window.switchLoginTab=switchLoginTab;
 window.doLogin=doLogin; window.doRegister=doRegister; window.doSearch=doSearch; window.clearSearch=clearSearch;
 window.submitComment=submitComment; window.submitReply=submitReply; window.deleteComment=deleteComment;
-window.showReplyForm=showReplyForm; window.hideReplyForm=hideReplyForm;
+window.showReplyForm=showReplyForm; window.hideReplyForm=hideReplyForm; window.voteComment=voteComment;
 window.submitPost=submitPost; window.votePost=votePost; window.deletePost=deletePost; window.togglePin=togglePin;
+window.markConcept=markConcept; window.goBackToBoardCategory=goBackToBoardCategory;
 window.adminSearchUser=adminSearchUser; window.adminBanUser=adminBanUser; window.adminUnbanUser=adminUnbanUser;
 window.adminPinPost=adminPinPost; window.adminDeletePost=adminDeletePost; window.adminSetLevel=adminSetLevel;
 window.prefillBan=prefillBan; window.prefillLevel=prefillLevel; window.quickBanUser=quickBanUser;
